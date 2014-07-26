@@ -10,7 +10,7 @@ package lnd.mn.nfa;
 public class Transition {
     private boolean isEpsilon;
     private String label = "";
-    private char   value;
+    private char   value = 0;
 
     private State incoming;
     private State outgoing;
@@ -28,7 +28,7 @@ public class Transition {
      *      The value for this edge in the NFA
      */
     public Transition(char value) {
-        value = value;
+        this.value = value;
         isEpsilon = false;
     }
 
@@ -44,6 +44,8 @@ public class Transition {
     }
 
 
+
+
     /**
      * Property Setters/Getters
      */
@@ -52,7 +54,7 @@ public class Transition {
     public void setIncoming(State s)    {incoming = s;}
     public State getIncoming()          {return incoming;}
     public void setOutgoing(State s)    {outgoing = s;}
-    public State getOutgoing(State s)   {return outgoing;}
-
+    public State getOutgoing()   {return outgoing;}
+    public char getValue() {return value;}
 
 }

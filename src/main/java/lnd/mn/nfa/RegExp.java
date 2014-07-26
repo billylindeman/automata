@@ -2,6 +2,7 @@ package lnd.mn.nfa;
 
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 /**
  * This class lexes and parses a regular expression into something resembling an AST
@@ -10,14 +11,13 @@ import java.util.ArrayList;
  */
 public class RegExp {
     private ArrayList<Token> tokens;
+    private int index = 0;
 
     public RegExp(String regexp) {
         tokens = lex(regexp);
     }
 
-    public ArrayList<Token> getTokens() {
-        return tokens;
-    }
+
     private ArrayList<Token> lex(String regexp) {
         ArrayList<Token> tokens = new ArrayList<Token>();
 
@@ -32,6 +32,14 @@ public class RegExp {
             }
         }
         return tokens;
+    }
+
+    Stack<NFA> machines = new Stack<NFA>();
+
+    public NFA parse() {
+        Token t = getNextToken();
+
+        return NFA.Empty();
     }
 
     public static class Token {
@@ -81,4 +89,14 @@ public class RegExp {
             return value;
         }
     }
+    public Token getNextToken() {
+        index++;
+        if(index > tokens.size()-1) return null;
+        else return tokens.get(index++);
+    }
+
+    public void resetLexer() {
+        index =0;
+    }
+
 }

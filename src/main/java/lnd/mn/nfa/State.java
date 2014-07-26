@@ -13,8 +13,8 @@ public class State {
     public String label;
     private boolean isAccepting = false;
 
-    public LinkedList<Transition> outgoingEdges;
-    public LinkedList<Transition> incomingEdges;
+    public LinkedList<Transition> outgoingEdges = new LinkedList<Transition>();
+    public LinkedList<Transition> incomingEdges = new LinkedList<Transition>();
 
     public State(int id) {
         identifier = id;

@@ -14,7 +14,9 @@ import java.util.HashSet;
  */
 public class NFA {
     State start;
-    HashSet<State> accepting_states;
+
+    HashSet<State> states = new HashSet<State>();
+    HashSet<State> accepting_states = new HashSet<State>();
 
     /**
      * Builds NFA from a saved-instance
@@ -31,47 +33,26 @@ public class NFA {
      * @param regexString
      */
     public NFA(String regexString) {
-        /**
-         * Parse Regular Expression
-         */
-        RegExp regexp = new RegExp(regexString);
-
-        /**
-         * Build all Thompson machines
-         */
-
-        NFA machine = NFA.Empty();
-        for(RegExp.Token t : regexp.getTokens()) {
-            switch(t.getType()) {
-                case Symbol:
-                    /** push a single symbol machine */
-                    machine = NFA.Concat(machine, NFA.Symbol(t.getValue()));
-                    break;
-                case Star:
-                    /** push a single symbol machine */
-                    machine = NFA.KleeneClosure(machine);
-                case Plus:
-                    break;
-                case Or:
-                    break;
-                case OpenParen:
-                    break;
-                case CloseParen:
-                    break;
-                case OpenBracket:
-                    break;
-                case CloseBracket:
-                    break;
-            }
-        }
 
     }
 
+
+
     public NFA(State start, State... accepting) {
         this.start = start;
-
         for(State s : accepting) {
             accepting_states.add(s);
+        }
+        followEdgesAndBuildStatesSet(start);
+    }
+
+    private void followEdgesAndBuildStatesSet(State s) {
+        if(states.contains(s)) return;
+        else {
+            states.add(s);
+            for(Transition t : s.outgoingEdges) {
+                followEdgesAndBuildStatesSet(t.getOutgoing());
+            }
         }
     }
 
@@ -168,7 +149,40 @@ public class NFA {
     }
 
     public void saveGraph(String filename) throws FileNotFoundException, UnsupportedEncodingException {
-        PrintWriter writer = new PrintWriter(filename, "UTF-8");
+        PrintWriter graph = new PrintWriter(filename, "UTF-8");
+
+        graph.write("digraph NFA {\n");
+
+        for(State s : states) {
+            String shape = s.isAccepting() ? "doublecircle" : "circle";
+            graph.write(s.identifier + " [ label = \"" + s.identifier + "\", shape =\"" + shape + "\" ] \n");
+        }
+
+        for(State s : states) {
+            for(Transition t: s.outgoingEdges) {
+                String label = t.getValue() == 0? "\u03B5" : ""+t.getValue();
+                graph.write(t.getIncoming().identifier + "->" + t.getOutgoing().identifier + " [ label = \"" + label + "\" ]\n");
+            }
+        }
+
+        graph.write("}\n");
+        graph.close();
+    }
+
+
+    public static void main(String[] args) {
+
+        NFA n = NFA.Concat(
+                NFA.Symbol('b'),
+                    NFA.KleeneClosure(
+                            NFA.Symbol('a')
+                    )
+                );
+        try {
+            n.saveGraph("graph.dot");
+        }catch(Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
