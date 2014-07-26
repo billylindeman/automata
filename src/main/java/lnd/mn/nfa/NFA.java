@@ -2,6 +2,9 @@ package lnd.mn.nfa;
 
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 
 /**
@@ -22,21 +25,45 @@ public class NFA {
 
     }
 
+
      /**
      * Builds a new NFA from a RegularExpression using Thompson Construction
-     * @param regexp
+     * @param regexString
      */
-    public NFA(String regexp) {
+    public NFA(String regexString) {
         /**
          * Parse Regular Expression
          */
-
-
+        RegExp regexp = new RegExp(regexString);
 
         /**
          * Build all Thompson machines
          */
 
+        NFA machine = NFA.Empty();
+        for(RegExp.Token t : regexp.getTokens()) {
+            switch(t.getType()) {
+                case Symbol:
+                    /** push a single symbol machine */
+                    machine = NFA.Concat(machine, NFA.Symbol(t.getValue()));
+                    break;
+                case Star:
+                    /** push a single symbol machine */
+                    machine = NFA.KleeneClosure(machine);
+                case Plus:
+                    break;
+                case Or:
+                    break;
+                case OpenParen:
+                    break;
+                case CloseParen:
+                    break;
+                case OpenBracket:
+                    break;
+                case CloseBracket:
+                    break;
+            }
+        }
 
     }
 
@@ -139,4 +166,10 @@ public class NFA {
 
         return new NFA(start,accept);
     }
+
+    public void saveGraph(String filename) throws FileNotFoundException, UnsupportedEncodingException {
+        PrintWriter writer = new PrintWriter(filename, "UTF-8");
+
+    }
+
 }
